@@ -42,10 +42,10 @@ COPY --from=builder --chown=node:node /app/apps/${SCOPE}/.next/static ./apps/${S
 COPY --from=builder --chown=node:node /app/apps/${SCOPE}/public ./apps/${SCOPE}/public
 
 
-COPY scripts/${SCOPE}-entrypoint.sh ./
-RUN chmod +x ./${SCOPE}-entrypoint.sh
+COPY scripts/typebot-entrypoint.sh ./
+RUN chmod +x ./typebot-entrypoint.sh
 USER node
-ENTRYPOINT ./${SCOPE}-entrypoint.sh
+ENTRYPOINT ./typebot-entrypoint.sh
 
 EXPOSE 3000
 ENV PORT=3000
