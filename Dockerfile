@@ -23,23 +23,21 @@ WORKDIR /app
 # =============== INSTALL & BUILD =================
 
 FROM base AS builder
-ARG SCOPE
 COPY . .
 RUN SENTRYCLI_SKIP_DOWNLOAD=1 bun install --frozen-lockfile
-RUN SKIP_ENV_CHECK=true DATABASE_URL=postgresql:// NEXT_PUBLIC_VIEWER_URL=http://localhost bunx nx build ${SCOPE}
+RUN SKIP_ENV_CHECK=true DATABASE_URL=postgresql:// NEXT_PUBLIC_VIEWER_URL=http://localhost bunx nx build typebot
 RUN DATABASE_URL=postgresql:// bunx nx db:generate prisma
 
 # ================== RELEASE ======================
 
 FROM base AS release
-ARG SCOPE
-ENV SCOPE=${SCOPE}
+ENV SCOPE=typebot
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/prisma/postgresql ./packages/prisma/postgresql
 COPY --from=builder /app/packages/prisma/prisma.config.ts ./packages/prisma/prisma.config.ts
-COPY --from=builder --chown=node:node /app/apps/${SCOPE}/.next/standalone ./
-COPY --from=builder --chown=node:node /app/apps/${SCOPE}/.next/static ./apps/${SCOPE}/.next/static
-COPY --from=builder --chown=node:node /app/apps/${SCOPE}/public ./apps/${SCOPE}/public
+COPY --from=builder --chown=node:node /app/apps/typebot/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/typebot/.next/static ./apps/typebot/.next/static
+COPY --from=builder --chown=node:node /app/apps/typebot/public ./apps/typebot/public
 
 
 COPY scripts/typebot-entrypoint.sh ./
